@@ -170,36 +170,6 @@ html,body{background:var(--forest);min-height:100vh;font-family:"Barlow",system-
 </head>
 <body class="topo-bg">
 <div id="app">
-
-<!-- SETUP SCREEN - shown when no API key -->
-<div id="setup-screen" class="hidden" style="position:fixed;inset:0;background:#0d1a0f;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:Barlow,sans-serif">
-  <div style="max-width:400px;width:100%;text-align:center">
-    <div style="font-size:64px;margin-bottom:16px">&#x1F6B5;</div>
-    <div style="font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;color:#ffffff;letter-spacing:.5px;margin-bottom:4px">Trail<span style="color:#e8711a">Study</span></div>
-    <div style="font-size:13px;color:#6b8a68;margin-bottom:32px">Tu asistente de estudio personal, Pablo</div>
-    
-    <div style="background:#142b16;border-radius:16px;border:1px solid #2d5a30;padding:20px;text-align:left;margin-bottom:20px">
-      <div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:700;color:#f5c842;margin-bottom:8px;letter-spacing:.3px">&#x1F511; CONFIGURACION INICIAL</div>
-      <div style="font-size:13px;color:#d4e8d0;line-height:1.6;margin-bottom:16px">Para activar TrailStudy necesitas una clave API de Anthropic. Es gratuita y solo hay que hacerlo una vez.</div>
-      
-      <div style="font-size:12px;font-weight:700;color:#6b8a68;font-family:Barlow Condensed,sans-serif;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Paso 1 &mdash; Consigue tu clave gratis</div>
-      <a href="https://console.anthropic.com" target="_blank" style="display:block;background:#1e3d21;border:1px solid #e8711a;border-radius:10px;padding:10px 14px;color:#e8711a;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:16px;text-align:center">&#x1F517; Ir a console.anthropic.com &rarr;</a>
-      
-      <div style="font-size:11px;color:#6b8a68;margin-bottom:12px;line-height:1.5">Una vez dentro: <strong style="color:#d4e8d0">API Keys &rarr; Create Key</strong> &rarr; copia la clave (empieza por <code style="background:#0d1a0f;padding:2px 5px;border-radius:4px;color:#f5c842">sk-ant-</code>)</div>
-      
-      <div style="font-size:12px;font-weight:700;color:#6b8a68;font-family:Barlow Condensed,sans-serif;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Paso 2 &mdash; P&eacute;gala aqu&iacute;</div>
-      <input id="api-key-input" type="password" placeholder="sk-ant-..." style="width:100%;background:#0d1a0f;border:2px solid #2d5a30;border-radius:10px;color:#f0f4ff;padding:12px 13px;font-size:14px;font-family:Barlow,sans-serif;outline:none;margin-bottom:8px" oninput="this.style.borderColor=this.value.startsWith('sk-ant-')?'#4caf50':'#2d5a30'"/>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <input type="checkbox" id="show-key" onchange="document.getElementById('api-key-input').type=this.checked?'text':'password'" style="cursor:pointer"/>
-        <label for="show-key" style="font-size:12px;color:#6b8a68;cursor:pointer">Mostrar clave</label>
-      </div>
-      <button id="setup-btn" onclick="guardarClave()" style="width:100%;background:linear-gradient(135deg,#e8711a,#f5c842);color:#0d1a0f;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:16px;border:none;border-radius:10px;padding:14px;cursor:pointer;letter-spacing:.4px">&#x1F680; &iexcl;Activar TrailStudy!</button>
-      <div id="setup-error" style="display:none;margin-top:10px;background:rgba(232,64,64,.15);border:1px solid #e84040;border-radius:8px;padding:10px;font-size:12px;color:#ff8080;line-height:1.5"></div>
-    </div>
-    
-    <div style="font-size:11px;color:#6b8a68;line-height:1.5">&#x1F512; Tu clave se guarda solo en este dispositivo.<br>Nadie m&aacute;s puede verla.</div>
-  </div>
-</div>
 <div class="toast" id="toast"></div>
 
 <header class="hdr">
@@ -233,6 +203,7 @@ html,body{background:var(--forest);min-height:100vh;font-family:"Barlow",system-
   <button class="nb" data-mod="agenda" onclick="switchMod(this,'var(--river)')"><span class="ni">&#x1F4C5;</span><span class="nl">RUTA HOY</span></button>
   <button class="nb" data-mod="emocional" onclick="switchMod(this,'#e84080')"><span class="ni">&#x1F4AA;</span><span class="nl">ANIMO</span></button>
   <button class="nb" data-mod="mochila" onclick="switchMod(this,'var(--success)')"><span class="ni">&#x1F392;</span><span class="nl">MOCHILA</span></button>
+  <button class="nb" data-mod="config" onclick="switchMod(this,'#f5c842')" id="nav-config"><span class="ni">&#x2699;&#xFE0F;</span><span class="nl">CONFIG</span></button>
 </nav>
 
 <main class="main">
@@ -444,6 +415,73 @@ html,body{background:var(--forest);min-height:100vh;font-family:"Barlow",system-
   <div><p class="stitle" style="color:var(--river)">MIS TARJETAS GUIA</p><div id="moch-tarjetas" style="display:flex;flex-direction:column;gap:7px"></div></div>
 </div>
 
+
+<!-- CONFIG -->
+<div id="mod-config" class="mod hidden">
+  <div class="mhdr" style="background:linear-gradient(135deg,#2a2a0d,#1a1a05);border:1px solid rgba(245,200,66,.3)">
+    <span class="mhdr-ic">&#x2699;&#xFE0F;</span>
+    <div>
+      <div class="mhdr-title">CONFIGURACI&Oacute;N</div>
+      <div class="mhdr-sub">Introduce tu clave API para activar la inteligencia artificial</div>
+    </div>
+  </div>
+
+  <!-- Estado actual -->
+  <div id="cfg-status" class="card" style="border-color:rgba(76,175,80,.4);background:rgba(13,42,13,.8);display:none">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:32px">&#x2705;</span>
+      <div>
+        <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:#4caf50">TrailStudy ACTIVADO</div>
+        <div style="font-size:12px;color:#6b8a68;margin-top:2px">La IA est&aacute; funcionando correctamente</div>
+      </div>
+    </div>
+    <button onclick="borrarClave()" class="btn btn-ghost" style="width:100%;margin-top:12px;justify-content:center">&#x1F511; Cambiar clave API</button>
+  </div>
+
+  <!-- Formulario -->
+  <div id="cfg-form" class="card">
+    <div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:700;color:#f5c842;margin-bottom:12px;letter-spacing:.3px">&#x1F511; PASO 1 &mdash; CONSIGUE TU CLAVE GRATIS</div>
+    <div style="font-size:13px;color:#d4e8d0;line-height:1.6;margin-bottom:12px">
+      Ve a <strong>console.anthropic.com</strong>, crea una cuenta gratuita y compra 5$ de cr&eacute;ditos (duran meses con el uso de Pablo).
+    </div>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" class="btn btn-sun" style="width:100%;justify-content:center;text-decoration:none;margin-bottom:16px;display:flex">
+      &#x1F517; Abrir console.anthropic.com &rarr;
+    </a>
+    <div style="font-size:12px;color:#6b8a68;line-height:1.5;margin-bottom:16px;background:#1e3d21;border-radius:8px;padding:10px">
+      Una vez dentro: <strong style="color:#d4e8d0">Settings &rarr; API Keys &rarr; Create Key</strong><br>
+      Copia la clave. Empieza por <code style="background:#0d1a0f;padding:1px 5px;border-radius:4px;color:#f5c842;font-size:11px">sk-ant-api03-...</code>
+    </div>
+
+    <div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:700;color:#f5c842;margin-bottom:10px;letter-spacing:.3px">&#x1F4CB; PASO 2 &mdash; P&Eacute;GALA AQU&Iacute;</div>
+    <div style="position:relative;margin-bottom:8px">
+      <input id="cfg-key-input" type="password"
+        placeholder="sk-ant-api03-..."
+        style="width:100%;background:#0d1a0f;border:2px solid #2d5a30;border-radius:10px;color:#f0f4ff;padding:13px 46px 13px 13px;font-size:14px;font-family:Barlow,sans-serif;outline:none;transition:border-color .2s"
+        oninput="onKeyInput(this)"/>
+      <button onclick="toggleVerClave()" id="cfg-eye" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;padding:0">&#x1F441;&#xFE0F;</button>
+    </div>
+    <div id="cfg-key-hint" style="font-size:11px;color:#6b8a68;margin-bottom:14px;min-height:16px"></div>
+
+    <button id="cfg-btn" onclick="guardarClave()" class="btn btn-sun" style="width:100%;justify-content:center;font-size:16px">
+      &#x1F680; Activar TrailStudy
+    </button>
+    <div id="cfg-error" style="display:none;margin-top:10px;background:rgba(232,64,64,.15);border:1px solid #e84040;border-radius:8px;padding:10px;font-size:13px;color:#ff8080;line-height:1.5"></div>
+  </div>
+
+  <!-- Info -->
+  <div class="card" style="border-color:rgba(58,181,198,.2)">
+    <div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;color:#3ab5c6;margin-bottom:8px;letter-spacing:.3px">&#x2139;&#xFE0F; PREGUNTAS FRECUENTES</div>
+    <div style="font-size:13px;color:#6b8a68;line-height:1.7">
+      <strong style="color:#d4e8d0">&#x1F4B0; &iquest;Cu&aacute;nto cuesta?</strong><br>
+      Con 5$ tienes para varios meses. Pablo gasta aprox. 0,01$ por sesi&oacute;n.<br><br>
+      <strong style="color:#d4e8d0">&#x1F512; &iquest;Es segura mi clave?</strong><br>
+      S&iacute;. Se guarda solo en este dispositivo. Nadie m&aacute;s puede verla.<br><br>
+      <strong style="color:#d4e8d0">&#x1F4F1; &iquest;Funciona en m&oacute;vil y tablet?</strong><br>
+      S&iacute;. Funciona en cualquier dispositivo con navegador y conexi&oacute;n a internet.
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 <script>
@@ -531,15 +569,10 @@ function stopSpeech(){if(window.speechSynthesis)window.speechSynthesis.cancel();
 function speak(text,onEnd){stopSpeech();if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(text.replace(/[*#_]/g,""));u.lang="es-ES";u.rate=0.88;u.pitch=1.05;var vs=window.speechSynthesis.getVoices();var es=vs.find(function(v){return v.lang.indexOf("es")===0;});if(es)u.voice=es;u.onend=function(){curUtt=null;if(onEnd)onEnd();};curUtt=u;window.speechSynthesis.speak(u);}
 function toggleAudio(btnId,divId){var btn=el(btnId);if(curUtt){stopSpeech();document.querySelectorAll(".btn-audio").forEach(function(b){b.classList.remove("playing");b.innerHTML="&#x1F50A; Escuchar";});return;}var txt=el(divId).innerText;btn.classList.add("playing");btn.innerHTML="&#x23F9; Parar";speak(txt,function(){btn.classList.remove("playing");btn.innerHTML="&#x1F50A; Escuchar";});}
 // API - includes required browser header
-function getAPIKey(){return localStorage.getItem("trailstudy_api_key")||"";}
-function mostrarSetup(){var s=document.getElementById("setup-screen");s.style.display="flex";}
-function ocultarSetup(){var s=document.getElementById("setup-screen");s.style.display="none";}
 async function callClaude(messages,system){
-  var key=getAPIKey();
-  if(!key){mostrarSetup();return "Introduce tu clave API para continuar.";}
   var res=await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
-    headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":key,"anthropic-version":"2023-06-01"},
+    headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true"},
     body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:system,messages:messages})
   });
   var data=await res.json();
@@ -587,15 +620,58 @@ function initMochila(){
 function togTarj(id){var s=el("tsteps-"+id);var a=el("tarr-"+id);var open=!s.classList.contains("hidden");s.classList.toggle("hidden",open);a.innerHTML=open?"&#x25BC;":"&#x25B2;";}
 function leerTarj(id){var t=TARJETAS.find(function(x){return x.id===id;});speak(t.titulo+". "+t.pasos.join(". "));}
 function initMateChips(){var c=el("mate-chips");TARJETAS.slice(0,5).forEach(function(t){var b=document.createElement("button");b.className="chip";b.textContent=t.em+" "+t.titulo;b.onclick=function(){if(S.mateChip===t.id){S.mateChip=null;el("mate-chip-exp").classList.add("hidden");b.classList.remove("active");}else{document.querySelectorAll("#mate-chips .chip").forEach(function(x){x.classList.remove("active");});S.mateChip=t.id;b.classList.add("active");el("mate-chip-exp").innerHTML="<strong>"+t.em+" "+t.titulo+"</strong><ol>"+t.pasos.map(function(p){return "<li>"+p+"</li>";}).join("")+"</ol>";el("mate-chip-exp").classList.remove("hidden");}};c.appendChild(b);});}
-function showBanner(msg){var b=document.createElement("div");b.className="api-banner";var sp=document.createElement("span");sp.textContent=msg;var x=document.createElement("button");x.className="api-banner-x";x.textContent="X";x.onclick=function(){b.remove();};b.appendChild(sp);b.appendChild(x);document.body.prepend(b);}
+
+window.addEventListener("DOMContentLoaded",function(){
+  initMateChips();initMochila();updateXP();
+  if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.addEventListener("voiceschanged",function(){});}
+  var h=new Date().getHours();
+  try{el("hdr-sub").textContent=h<14?"Buenos dias, Pablo!":h<20?"Buenas tardes!":"Buenas noches!";}catch(e){}
+  actualizarEstadoClave();
+  if(!getAPIKey()){
+    switchMod(document.querySelector("[data-mod='config']"),"#f5c842");
+  }
+});
+
+// ══ API KEY MANAGEMENT ═══════════════════════════════════════════
+function getAPIKey(){return localStorage.getItem("ts_api_key")||"";}
+
+function onKeyInput(inp){
+  var v=inp.value.trim();
+  var hint=document.getElementById("cfg-key-hint");
+  if(!v){hint.textContent="";inp.style.borderColor="#2d5a30";return;}
+  if(v.startsWith("sk-ant-")){inp.style.borderColor="#4caf50";hint.style.color="#4caf50";hint.textContent="Formato correcto";}
+  else{inp.style.borderColor="#e84040";hint.style.color="#ff8080";hint.textContent="Debe empezar por sk-ant-";}
+}
+
+function toggleVerClave(){
+  var inp=document.getElementById("cfg-key-input");
+  inp.type=inp.type==="password"?"text":"password";
+}
+
+function borrarClave(){
+  localStorage.removeItem("ts_api_key");
+  actualizarEstadoClave();
+}
+
+function actualizarEstadoClave(){
+  var key=getAPIKey();
+  var status=document.getElementById("cfg-status");
+  var form=document.getElementById("cfg-form");
+  if(key){status.style.display="block";form.style.display="none";}
+  else{status.style.display="none";form.style.display="block";}
+  // Update nav config icon
+  var navCfg=document.getElementById("nav-config");
+  if(navCfg) navCfg.querySelector(".ni").textContent=key?"&#x2705;":"&#x2699;&#xFE0F;";
+}
+
 async function guardarClave(){
-  var key=document.getElementById("api-key-input").value.trim();
-  var btn=document.getElementById("setup-btn");
-  var err=document.getElementById("setup-error");
+  var key=document.getElementById("cfg-key-input").value.trim();
+  var btn=document.getElementById("cfg-btn");
+  var err=document.getElementById("cfg-error");
   err.style.display="none";
   if(!key){err.textContent="Pega tu clave antes de continuar.";err.style.display="block";return;}
   if(!key.startsWith("sk-ant-")){err.textContent="La clave debe empezar por sk-ant- Comprueba que la has copiado completa.";err.style.display="block";return;}
-  btn.disabled=true;btn.innerHTML="<span class=\'spin\'></span> Verificando...";
+  btn.disabled=true;btn.innerHTML="<span class='spin'></span> Verificando...";
   try{
     var res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
@@ -604,40 +680,48 @@ async function guardarClave(){
     });
     var data=await res.json();
     if(data.error&&data.error.type==="authentication_error"){
-      err.innerHTML="Clave incorrecta. Comprueba que la has copiado bien desde <strong>console.anthropic.com</strong>";
-      err.style.display="block";btn.disabled=false;btn.innerHTML="Activar TrailStudy";return;
+      err.innerHTML="Clave incorrecta. Copiale de nuevo desde <strong>console.anthropic.com &rarr; API Keys</strong>";
+      err.style.display="block";btn.disabled=false;btn.innerHTML="&#x1F680; Activar TrailStudy";return;
     }
-    localStorage.setItem("trailstudy_api_key",key);
-    btn.innerHTML="Clave guardada!";
-    setTimeout(function(){ocultarSetup();toast("TrailStudy activado! Bienvenido, Pablo!");},800);
+    localStorage.setItem("ts_api_key",key);
+    btn.innerHTML="&#x2705; Activado!";
+    setTimeout(function(){
+      actualizarEstadoClave();
+      toast("TrailStudy activado! Bienvenido, Pablo!");
+      switchMod(document.querySelector("[data-mod='express']"),"var(--trail)");
+    },800);
   }catch(e){
     err.textContent="Error de conexion. Comprueba que tienes internet.";
-    err.style.display="block";btn.disabled=false;btn.innerHTML="Activar TrailStudy";
+    err.style.display="block";btn.disabled=false;btn.innerHTML="&#x1F680; Activar TrailStudy";
   }
 }
-window.addEventListener("DOMContentLoaded",function(){
-  initMateChips();initMochila();updateXP();
-  if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.addEventListener("voiceschanged",function(){});}
-  var h=new Date().getHours();
-  try{el("hdr-sub").textContent=h<14?"Buenos dias, Pablo!":h<20?"Buenas tardes!":"Buenas noches!";}catch(e){}
-  // Check for API key on startup
-  if(!getAPIKey()){
-    mostrarSetup();
+
+// ══ UPDATED callClaude WITH KEY ═══════════════════════════════════
+async function callClaude(messages,system){
+  var key=getAPIKey();
+  if(!key){
+    switchMod(document.querySelector("[data-mod='config']"),"#f5c842");
+    return "Primero configura tu clave API en la pestana CONFIG.";
   }
-  // Add settings button to mochila
-  var moch=el("mod-mochila");
-  if(moch){
-    var settingsBtn=document.createElement("button");
-    settingsBtn.className="btn btn-ghost";
-    settingsBtn.style="width:100%;margin-top:8px;justify-content:center";
-    settingsBtn.innerHTML="&#x2699;&#xFE0F; Cambiar clave API";
-    settingsBtn.onclick=function(){
-      document.getElementById("api-key-input").value="";
-      mostrarSetup();
-    };
-    moch.appendChild(settingsBtn);
+  var res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":key,"anthropic-version":"2023-06-01"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:system,messages:messages})
+  });
+  var data=await res.json();
+  if(data.error){
+    if(data.error.type==="authentication_error"){
+      localStorage.removeItem("ts_api_key");
+      actualizarEstadoClave();
+      switchMod(document.querySelector("[data-mod='config']"),"#f5c842");
+      return "Clave API incorrecta. Ve a CONFIG para actualizarla.";
+    }
+    if(data.error.type==="insufficient_quota"){return "Sin creditos API. Recarga en console.anthropic.com";}
+    return "Error: "+data.error.message;
   }
-});
+  return data.content&&data.content[0]?data.content[0].text:"No pude generar respuesta.";
+}
+
 // Service worker ONLY on https - NOT on file://
 if("serviceWorker" in navigator && location.protocol==="https:"){
   window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});
