@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#0d1a0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="TrailStudy"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>TrailStudy &#x2014; Pablo</title>
+<script>
+// Manifest inline via blob - works on file:// AND https://
+(function(){
+  try{
+    var m={"name":"TrailStudy — Pablo","short_name":"TrailStudy","description":"Tu asistente de estudio personal","start_url":"/","display":"standalone","background_color":"#0d1a0f","theme_color":"#0d1a0f","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]};
+    var blob=new Blob([JSON.stringify(m)],{type:"application/json"});
+    var link=document.createElement("link");link.rel="manifest";link.href=URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  }catch(e){}
+})();
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;600;700&display=swap');
+:root{
+  --forest:#0d1a0f;--pine:#142b16;--moss:#1e3d21;--leaf:#2d5a30;
+  --trail:#e8711a;--sun:#f5c842;--river:#3ab5c6;
+  --white:#ffffff;--txt:#d4e8d0;--txt-dim:#6b8a68;
+  --danger:#e84040;--success:#4caf50;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{background:var(--forest);min-height:100vh;font-family:"Barlow",system-ui,sans-serif;color:var(--txt);overflow-x:hidden}
+.topo-bg{background-color:var(--forest);background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(45,90,48,.18) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(45,90,48,.18) 40px);background-size:40px 40px}
+.hdr{background:linear-gradient(180deg,var(--pine),rgba(13,26,15,.95));border-bottom:2px solid var(--leaf);padding:10px 14px;position:sticky;top:0;z-index:200;backdrop-filter:blur(8px)}
+.hdr-i{max-width:740px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.logo-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--trail),var(--sun));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 10px rgba(232,113,26,.4)}
+.logo-text{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:900;color:var(--white);letter-spacing:.5px;line-height:1}
+.logo-text span{color:var(--trail)}
+.logo-sub{font-size:10px;color:var(--txt-dim)}
+.hdr-center{flex:1;padding:0 8px}
+.xp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.xp-lvl{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--sun)}
+.xp-pts{font-size:10px;color:var(--txt-dim)}
+.xp-track{height:7px;background:var(--moss);border-radius:20px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--trail),var(--sun));border-radius:20px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.av-btn{width:40px;height:40px;background:var(--moss);border:2px solid var(--leaf);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;position:relative;flex-shrink:0;touch-action:manipulation}
+.av-lvl-tag{position:absolute;bottom:-3px;right:-3px;background:var(--trail);color:var(--white);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;font-family:"Barlow Condensed",sans-serif}
+.nav{background:var(--pine);display:flex;border-bottom:1px solid var(--leaf);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:60px;z-index:199}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex:1;min-width:60px;padding:8px 4px;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;color:var(--txt-dim);display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s;white-space:nowrap;touch-action:manipulation;font-family:"Barlow",sans-serif}
+.nb .ni{font-size:16px}.nb .nl{font-size:10px;font-weight:600;letter-spacing:.3px}
+.nb.active{color:var(--white)}.nb.active .nl{font-weight:700}
+.main{max-width:740px;margin:0 auto;padding:14px 12px 100px}
+.mod{display:flex;flex-direction:column;gap:14px}
+.mhdr{border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.mhdr-bg-trail{background:linear-gradient(135deg,#1a3a1c,#0d2a1a);border:1px solid rgba(232,113,26,.3)}
+.mhdr-bg-exp{background:linear-gradient(135deg,#1a2f3a,#0d1f2a);border:1px solid rgba(58,181,198,.3)}
+.mhdr-bg-exa{background:linear-gradient(135deg,#2a2a0d,#1a1a05);border:1px solid rgba(245,200,66,.3)}
+.mhdr-bg-mate{background:linear-gradient(135deg,#1f1a3a,#110d2a);border:1px solid rgba(130,100,255,.3)}
+.mhdr-bg-ag{background:linear-gradient(135deg,#0d2a2a,#051a1a);border:1px solid rgba(58,181,198,.3)}
+.mhdr-bg-emo{background:linear-gradient(135deg,#2a0d1a,#1a0510);border:1px solid rgba(232,64,64,.3)}
+.mhdr-ic{font-size:36px;flex-shrink:0}
+.mhdr-title{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:900;color:var(--white);letter-spacing:.3px;line-height:1.1}
+.mhdr-sub{font-size:11px;color:var(--txt-dim);margin-top:3px;line-height:1.4}
+.mhdr-badge{position:absolute;top:10px;right:12px;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;letter-spacing:.5px}
+.card{background:var(--pine);border-radius:14px;border:1px solid var(--leaf);padding:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mbtn{background:var(--moss);border:2px solid var(--leaf);border-radius:12px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:3px;color:var(--txt-dim);transition:all .18s;text-align:left;touch-action:manipulation;min-height:68px;width:100%}
+.mbtn .me{font-size:18px}.mbtn .ml{font-size:12px;font-weight:700;color:var(--txt);line-height:1.2;font-family:"Barlow Condensed",sans-serif;letter-spacing:.2px}.mbtn .md{font-size:10px;color:var(--txt-dim);line-height:1.3}
+.mbtn.active{background:rgba(232,113,26,.15);border-color:var(--trail);color:var(--white)}.mbtn.active .ml{color:var(--white)}
+.ta{width:100%;background:var(--moss);border:1px solid var(--leaf);border-radius:10px;color:var(--txt);padding:11px 12px;font-size:15px;line-height:1.6;resize:vertical;outline:none;font-family:"Barlow",sans-serif;min-height:85px}
+.ta:focus{border-color:var(--trail);box-shadow:0 0 0 2px rgba(232,113,26,.15)}.ta::placeholder{color:var(--txt-dim)}
+.ia{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.btn{border:none;border-radius:10px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:.4px;touch-action:manipulation;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn:disabled{opacity:.4;cursor:not-allowed}.btn:active:not(:disabled){transform:scale(.97)}
+.btn-trail{background:linear-gradient(135deg,var(--trail),#f08030);color:var(--white);padding:12px 20px;font-size:15px;min-height:46px;box-shadow:0 3px 12px rgba(232,113,26,.35)}
+.btn-sun{background:linear-gradient(135deg,var(--sun),#e8a020);color:var(--forest);padding:12px 20px;font-size:15px;min-height:46px}
+.btn-river{background:linear-gradient(135deg,var(--river),#2a9aaa);color:var(--white);padding:12px 20px;font-size:15px;min-height:46px}
+.btn-ghost{background:var(--moss);color:var(--txt);border:1px solid var(--leaf);padding:10px 14px;font-size:13px;min-height:42px;font-family:"Barlow Condensed",sans-serif;font-weight:700}
+.btn-audio{background:linear-gradient(135deg,#3a2a7a,#5a3aaa);color:var(--white);padding:9px 14px;font-size:13px;min-height:42px;white-space:nowrap;font-family:"Barlow Condensed",sans-serif;font-weight:700}
+.btn-audio.playing{background:linear-gradient(135deg,var(--danger),#c02060)}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#c03060);color:var(--white);padding:12px 20px;font-size:15px;min-height:46px}
+.btn-purple{background:linear-gradient(135deg,#6a3aed,#4f46e5);color:var(--white);padding:12px 18px;font-size:15px;min-height:46px}
+.btn-ml{margin-left:auto}
+.rbox{background:var(--pine);border-radius:14px;border:1px solid var(--leaf);padding:15px}
+.rbox-river{border-color:rgba(58,181,198,.4);background:rgba(13,26,26,.9)}
+.rbox-sun{border-color:rgba(245,200,66,.4);background:rgba(26,26,13,.9)}
+.rbox-purple{border-color:rgba(130,100,255,.4);background:rgba(20,13,42,.9)}
+.rbox-danger{border-color:rgba(232,64,64,.4);background:rgba(42,13,20,.9)}
+.rhdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.rlbl{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px}
+.rbody{color:var(--txt);line-height:1.85;font-size:15px}.rbody p{margin:5px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--moss);border:1px solid var(--leaf);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--txt-dim);white-space:nowrap;touch-action:manipulation;min-height:34px;display:inline-flex;align-items:center;font-family:"Barlow",sans-serif;font-weight:600;transition:all .15s}
+.chip.active{background:rgba(232,113,26,.2);border-color:var(--trail);color:var(--trail)}
+.chip-exp{background:var(--moss);border-radius:12px;padding:12px 14px;margin-top:8px;border:1px solid rgba(232,113,26,.25)}
+.chip-exp strong{color:var(--trail)}.chip-exp ol{margin:7px 0 0;padding-left:17px}.chip-exp li{color:var(--txt);margin:4px 0;font-size:14px}
+.tcard{background:var(--pine);border-radius:12px;border:1px solid var(--leaf);padding:12px 13px;transition:border-color .2s}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ttog{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:9px;flex:1;text-align:left;padding:0;touch-action:manipulation;min-height:42px}
+.ttog .te{font-size:22px}.ttog .tt{color:var(--txt);font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;letter-spacing:.2px}.ttog .ta2{color:var(--txt-dim);margin-left:auto;font-size:12px}
+.tsteps{margin:9px 0 0;padding:9px 0 0 17px;border-top:1px solid var(--leaf)}.tsteps li{color:var(--txt);margin:4px 0;font-size:14px}
+.tpq{background:var(--pine);border-radius:12px;border:2px solid var(--leaf);padding:13px;margin-bottom:9px;transition:border-color .2s}
+.tpq.ok{border-color:var(--success)}.tpq.mal{border-color:var(--danger)}
+.tq{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;margin-bottom:9px;color:var(--white);letter-spacing:.2px}
+.top{display:block;width:100%;background:var(--moss);border:1px solid var(--leaf);border-radius:8px;padding:10px 12px;cursor:pointer;color:var(--txt);text-align:left;margin:4px 0;font-size:14px;touch-action:manipulation;min-height:42px;transition:all .15s;font-family:"Barlow",sans-serif}
+.top.cor{background:rgba(76,175,80,.15);border-color:var(--success);color:var(--success)}
+.top.mal{background:rgba(232,64,64,.15);border-color:var(--danger);color:var(--danger)}
+.tfb{margin-top:7px;font-weight:700;font-size:13px;font-family:"Barlow Condensed",sans-serif}
+.tfb.ok{color:var(--success)}.tfb.mal{color:var(--danger)}
+.score{background:linear-gradient(135deg,var(--pine),var(--moss));border-radius:16px;border:1px solid var(--leaf);padding:24px 16px;text-align:center;margin-top:12px}
+.score-em{font-size:44px;margin-bottom:6px}.score-n{font-family:"Barlow Condensed",sans-serif;font-size:44px;font-weight:900;color:var(--sun);margin:4px 0}.score-m{color:var(--txt);font-size:14px}
+.ex-prog{display:flex;gap:6px;margin-bottom:14px}
+.ex-dot{flex:1;height:5px;border-radius:20px;background:var(--moss);transition:all .3s}
+.ex-dot.done-d{background:var(--success)}.ex-dot.cur{background:var(--trail)}
+.ex-step{background:var(--pine);border-radius:14px;border:2px solid var(--leaf);padding:14px;position:relative}
+.ex-step.active{border-color:var(--trail);box-shadow:0 0 20px rgba(232,113,26,.1)}
+.ex-step-lbl{display:inline-block;margin-bottom:10px;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:12px}
+.lbl-trail{background:rgba(232,113,26,.2);color:var(--trail)}.lbl-sun{background:rgba(245,200,66,.2);color:var(--sun)}.lbl-river{background:rgba(58,181,198,.2);color:var(--river)}.lbl-success{background:rgba(76,175,80,.2);color:var(--success)}
+.tarea{background:var(--pine);border-radius:12px;border:1px solid var(--leaf);padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:all .3s}
+.tarea.done{opacity:.4}.tarea-ic{font-size:24px;flex-shrink:0}.tarea-body{flex:1}
+.tarea-asig{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--trail);letter-spacing:.3px}
+.tarea-desc{font-size:14px;color:var(--txt);margin-top:2px}.tarea-time{font-size:11px;color:var(--txt-dim);margin-top:2px}
+.tarea-chk{font-size:24px;cursor:pointer;touch-action:manipulation;padding:4px;flex-shrink:0}
+.emo-btn{background:var(--moss);border:2px solid var(--leaf);border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all .2s;width:100%}
+.emo-btn:active{border-color:var(--trail);background:rgba(232,113,26,.1)}
+.emo-ic{font-size:28px;display:block;margin-bottom:5px}.emo-lb{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.2px}
+.av-card{background:linear-gradient(135deg,var(--pine),var(--moss));border-radius:18px;border:2px solid var(--leaf);padding:20px;text-align:center;position:relative;overflow:hidden}
+.av-big{font-size:64px;margin-bottom:6px;display:block}.av-name{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:900;color:var(--white);letter-spacing:.5px}
+.av-title{display:inline-block;margin:6px 0 14px;font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:700;background:rgba(232,113,26,.2);color:var(--trail);padding:3px 12px;border-radius:12px;letter-spacing:.5px}
+.av-xp-track{background:var(--forest);border-radius:20px;height:10px;overflow:hidden;margin:4px 0 8px}
+.av-xp-fill{background:linear-gradient(90deg,var(--trail),var(--sun));height:100%;border-radius:20px;transition:width .6s}
+.av-xp-lbl{font-size:10px;color:var(--txt-dim);text-align:right}
+.av-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.av-stat{background:var(--forest);border-radius:10px;padding:10px 6px;text-align:center}
+.av-stat-n{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:900;color:var(--river)}.av-stat-l{font-size:10px;color:var(--txt-dim);margin-top:2px;line-height:1.2}
+.mision{background:var(--pine);border-radius:12px;border:1px solid var(--leaf);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mision.done{opacity:.55;border-color:rgba(76,175,80,.3)}.mision-ic{font-size:26px;flex-shrink:0}.mision-body{flex:1}
+.mision-tt{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:700;color:var(--white);letter-spacing:.2px}.mision-ds{font-size:11px;color:var(--txt-dim);margin-top:2px}
+.mision-xp{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--sun);white-space:nowrap}.mision-chk{font-size:20px}
+.logros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.logro{background:var(--pine);border-radius:12px;border:1px solid var(--leaf);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.logro.unlock{border-color:rgba(245,200,66,.4);background:rgba(42,42,13,.8)}
+.logro .le{font-size:24px}.logro .ln{font-size:10px;color:var(--txt-dim);text-align:center;line-height:1.3;font-weight:600}.logro .lk{font-size:10px;color:var(--txt-dim)}
+.racha-card{background:linear-gradient(135deg,rgba(232,113,26,.12),rgba(245,200,66,.08));border-radius:14px;border:1px solid rgba(232,113,26,.35);padding:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.racha-left{display:flex;align-items:center;gap:12px}.racha-fire{font-size:40px}
+.racha-n{font-family:"Barlow Condensed",sans-serif;font-size:32px;font-weight:900;color:var(--sun);line-height:1}.racha-lb{font-size:12px;color:var(--txt-dim)}
+.racha-right{text-align:right}.racha-msg{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;color:var(--success)}
+.racha-nx{font-size:11px;color:var(--txt-dim);margin:2px 0 5px}
+.ptrack{background:var(--moss);border-radius:20px;height:7px;width:130px;overflow:hidden;margin-left:auto}
+.pfill{background:linear-gradient(90deg,var(--trail),var(--sun));height:100%;border-radius:20px}
+.stitle{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;letter-spacing:.4px;margin-bottom:9px;color:var(--txt-dim);text-transform:uppercase}
+.img-prev{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--leaf)}
+.img-rm{background:none;border:none;color:var(--danger);cursor:pointer;font-size:20px;padding:4px;min-height:34px;min-width:34px;display:inline-flex;align-items:center;justify-content:center;touch-action:manipulation}
+.hidden{display:none!important}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slideup{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.slideup{animation:slideup .25s ease}
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--trail),var(--sun));color:var(--forest);font-family:"Barlow Condensed",sans-serif;font-weight:900;font-size:15px;letter-spacing:.3px;padding:10px 20px;border-radius:20px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(232,113,26,.4)}
+.toast.show{opacity:1}
+.api-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--trail);color:var(--forest);font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;padding:8px 16px;text-align:center;letter-spacing:.3px;display:flex;justify-content:center;align-items:center;gap:10px}
+.api-banner-x{background:none;border:none;color:var(--forest);font-size:18px;cursor:pointer;font-weight:900;flex-shrink:0;padding:0 4px}
+@media(max-width:380px){.logo-sub{display:none}.mhdr-title{font-size:19px}.mbtn{min-height:60px}.av-stats{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:600px){.main{padding:18px 20px 100px}.mhdr-title{font-size:24px}.mbtn{min-height:78px;padding:13px}.mbtn .me{font-size:20px}.mbtn .ml{font-size:14px}}
+</style>
+</head>
+<body class="topo-bg">
+<div id="app">
+
+<!-- SETUP SCREEN - shown when no API key -->
+<div id="setup-screen" class="hidden" style="position:fixed;inset:0;background:#0d1a0f;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:Barlow,sans-serif">
+  <div style="max-width:400px;width:100%;text-align:center">
+    <div style="font-size:64px;margin-bottom:16px">&#x1F6B5;</div>
+    <div style="font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;color:#ffffff;letter-spacing:.5px;margin-bottom:4px">Trail<span style="color:#e8711a">Study</span></div>
+    <div style="font-size:13px;color:#6b8a68;margin-bottom:32px">Tu asistente de estudio personal, Pablo</div>
+    
+    <div style="background:#142b16;border-radius:16px;border:1px solid #2d5a30;padding:20px;text-align:left;margin-bottom:20px">
+      <div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:700;color:#f5c842;margin-bottom:8px;letter-spacing:.3px">&#x1F511; CONFIGURACION INICIAL</div>
+      <div style="font-size:13px;color:#d4e8d0;line-height:1.6;margin-bottom:16px">Para activar TrailStudy necesitas una clave API de Anthropic. Es gratuita y solo hay que hacerlo una vez.</div>
+      
+      <div style="font-size:12px;font-weight:700;color:#6b8a68;font-family:Barlow Condensed,sans-serif;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Paso 1 &mdash; Consigue tu clave gratis</div>
+      <a href="https://console.anthropic.com" target="_blank" style="display:block;background:#1e3d21;border:1px solid #e8711a;border-radius:10px;padding:10px 14px;color:#e8711a;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:16px;text-align:center">&#x1F517; Ir a console.anthropic.com &rarr;</a>
+      
+      <div style="font-size:11px;color:#6b8a68;margin-bottom:12px;line-height:1.5">Una vez dentro: <strong style="color:#d4e8d0">API Keys &rarr; Create Key</strong> &rarr; copia la clave (empieza por <code style="background:#0d1a0f;padding:2px 5px;border-radius:4px;color:#f5c842">sk-ant-</code>)</div>
+      
+      <div style="font-size:12px;font-weight:700;color:#6b8a68;font-family:Barlow Condensed,sans-serif;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Paso 2 &mdash; P&eacute;gala aqu&iacute;</div>
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." style="width:100%;background:#0d1a0f;border:2px solid #2d5a30;border-radius:10px;color:#f0f4ff;padding:12px 13px;font-size:14px;font-family:Barlow,sans-serif;outline:none;margin-bottom:8px" oninput="this.style.borderColor=this.value.startsWith('sk-ant-')?'#4caf50':'#2d5a30'"/>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <input type="checkbox" id="show-key" onchange="document.getElementById('api-key-input').type=this.checked?'text':'password'" style="cursor:pointer"/>
+        <label for="show-key" style="font-size:12px;color:#6b8a68;cursor:pointer">Mostrar clave</label>
+      </div>
+      <button id="setup-btn" onclick="guardarClave()" style="width:100%;background:linear-gradient(135deg,#e8711a,#f5c842);color:#0d1a0f;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:16px;border:none;border-radius:10px;padding:14px;cursor:pointer;letter-spacing:.4px">&#x1F680; &iexcl;Activar TrailStudy!</button>
+      <div id="setup-error" style="display:none;margin-top:10px;background:rgba(232,64,64,.15);border:1px solid #e84040;border-radius:8px;padding:10px;font-size:12px;color:#ff8080;line-height:1.5"></div>
+    </div>
+    
+    <div style="font-size:11px;color:#6b8a68;line-height:1.5">&#x1F512; Tu clave se guarda solo en este dispositivo.<br>Nadie m&aacute;s puede verla.</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<header class="hdr">
+  <div class="hdr-i">
+    <div class="logo-wrap">
+      <div class="logo-icon">&#x1F6B5;</div>
+      <div>
+        <div class="logo-text">Trail<span>Study</span></div>
+        <div class="logo-sub" id="hdr-sub">Hola, Pablo &#x1F44B;</div>
+      </div>
+    </div>
+    <div class="hdr-center">
+      <div class="xp-row">
+        <span class="xp-lvl" id="xp-lvl-lbl">NIVEL 1</span>
+        <span class="xp-pts" id="xp-pts">0/100 XP</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    </div>
+    <div class="av-btn" onclick="goMochila()" title="Mi perfil">
+      <span id="hdr-av">&#x1F6B5;</span>
+      <span class="av-lvl-tag" id="hdr-lvl">1</span>
+    </div>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nb active" style="border-bottom-color:var(--trail)" data-mod="express" onclick="switchMod(this,'var(--trail)')"><span class="ni">&#x1F3AF;</span><span class="nl">EXPRESS</span></button>
+  <button class="nb" data-mod="explicame" onclick="switchMod(this,'var(--river)')"><span class="ni">&#x1F399;</span><span class="nl">EXPLICA</span></button>
+  <button class="nb" data-mod="examen" onclick="switchMod(this,'var(--sun)')"><span class="ni">&#x1F4DD;</span><span class="nl">EXAMEN</span></button>
+  <button class="nb" data-mod="mates" onclick="switchMod(this,'#a07aff')"><span class="ni">&#x1F9EE;</span><span class="nl">MATES</span></button>
+  <button class="nb" data-mod="agenda" onclick="switchMod(this,'var(--river)')"><span class="ni">&#x1F4C5;</span><span class="nl">RUTA HOY</span></button>
+  <button class="nb" data-mod="emocional" onclick="switchMod(this,'#e84080')"><span class="ni">&#x1F4AA;</span><span class="nl">ANIMO</span></button>
+  <button class="nb" data-mod="mochila" onclick="switchMod(this,'var(--success)')"><span class="ni">&#x1F392;</span><span class="nl">MOCHILA</span></button>
+</nav>
+
+<main class="main">
+
+<!-- EXPRESS -->
+<div id="mod-express" class="mod">
+  <div class="mhdr mhdr-bg-trail">
+    <span class="mhdr-ic">&#x1F3AF;</span>
+    <div>
+      <div class="mhdr-title">ESTUDIO EXPRESS</div>
+      <div class="mhdr-sub">Foto de cualquier p&aacute;gina &rarr; 4 etapas autom&aacute;ticas &rarr; &iexcl;Cima!</div>
+    </div>
+    <span class="mhdr-badge" style="background:rgba(232,113,26,.2);color:var(--trail)">+50 XP</span>
+  </div>
+  <div class="ex-prog"><div class="ex-dot cur" id="exd0"></div><div class="ex-dot" id="exd1"></div><div class="ex-dot" id="exd2"></div><div class="ex-dot" id="exd3"></div></div>
+  <div id="ex-s0" class="ex-step active">
+    <span class="ex-step-lbl lbl-trail">&#x26F0; PUNTO DE SALIDA</span>
+    <textarea id="ex-texto" class="ta" placeholder="Escribe el tema o pega el texto aqui..." rows="3"></textarea>
+    <div class="ia">
+      <button class="btn btn-ghost" onclick="document.getElementById('ex-file').click()">&#x1F4F8; Foto del libro</button>
+      <input id="ex-file" type="file" accept="image/*" class="hidden" onchange="loadImg(this,'ex-preview','ex')"/>
+      <img id="ex-preview" class="img-prev hidden" alt=""/>
+      <button id="ex-remove" class="img-rm hidden" onclick="removeImg('ex')">&#x2715;</button>
+      <button class="btn btn-trail btn-ml" id="ex-start-btn" onclick="expressStart()">&#x1F680; &iexcl;Arrancar!</button>
+    </div>
+  </div>
+  <div id="ex-s1" class="ex-step hidden">
+    <span class="ex-step-lbl lbl-trail">ETAPA 1 &mdash; Te lo explico</span>
+    <div id="ex-exp-body" class="rbody" style="margin-top:8px"></div>
+    <div class="ia" style="margin-top:10px">
+      <button class="btn btn-audio" id="ex-aud1" onclick="toggleAudio('ex-aud1','ex-exp-body')">&#x1F50A; Escuchar</button>
+      <button class="btn btn-trail btn-ml" onclick="expressStep(2)">Siguiente etapa &rarr;</button>
+    </div>
+  </div>
+  <div id="ex-s2" class="ex-step hidden">
+    <span class="ex-step-lbl lbl-sun">ETAPA 2 &mdash; Te pregunto</span>
+    <div id="ex-q-body" class="rbody" style="margin-top:8px"></div>
+    <div class="ia" style="margin-top:10px">
+      <button class="btn btn-audio" id="ex-aud2" onclick="toggleAudio('ex-aud2','ex-q-body')">&#x1F50A; Escuchar</button>
+      <button class="btn btn-sun btn-ml" onclick="expressStep(3)">Siguiente etapa &rarr;</button>
+    </div>
+  </div>
+  <div id="ex-s3" class="ex-step hidden">
+    <span class="ex-step-lbl lbl-river">ETAPA 3 &mdash; Mini test</span>
+    <div id="ex-test-body" style="margin-top:8px"></div>
+    <div id="ex-test-score" class="hidden"></div>
+  </div>
+  <div id="ex-s4" class="ex-step hidden" style="border-color:var(--success)">
+    <span class="ex-step-lbl lbl-success">&#x1F3C6; &iexcl;CIMA ALCANZADA!</span>
+    <div id="ex-resumen-body" class="rbody" style="margin-top:8px"></div>
+    <div class="ia" style="margin-top:10px">
+      <button class="btn btn-audio" id="ex-aud4" onclick="toggleAudio('ex-aud4','ex-resumen-body')">&#x1F50A; Escuchar</button>
+      <button class="btn btn-trail btn-ml" onclick="expressReset()">&#x1F504; Nueva ruta</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPLICAME -->
+<div id="mod-explicame" class="mod hidden">
+  <div class="mhdr mhdr-bg-exp"><span class="mhdr-ic">&#x1F399;</span><div><div class="mhdr-title">EXPLICAME ESTO</div><div class="mhdr-sub">Sube foto o escribe &mdash; elige c&oacute;mo lo quieres entender</div></div></div>
+  <div class="g2">
+    <button class="mbtn active" data-group="exp" data-val="clase" onclick="selModo(this,'exp')"><span class="me">&#x1F393;</span><span class="ml">Como en clase</span><span class="md">Explicaci&oacute;n ordenada</span></button>
+    <button class="mbtn" data-group="exp" data-val="cuento" onclick="selModo(this,'exp')"><span class="me">&#x1F4D6;</span><span class="ml">Como historia</span><span class="md">Divertida y memorable</span></button>
+    <button class="mbtn" data-group="exp" data-val="preguntas" onclick="selModo(this,'exp')"><span class="me">&#x2753;</span><span class="ml">Hazme preguntas</span><span class="md">Para ver si lo entiendo</span></button>
+    <button class="mbtn" data-group="exp" data-val="repaso" onclick="selModo(this,'exp')"><span class="me">&#x1F501;</span><span class="ml">Repaso r&aacute;pido</span><span class="md">5 puntos clave</span></button>
+    <button class="mbtn" data-group="exp" data-val="simple" onclick="selModo(this,'exp')"><span class="me">&#x1F423;</span><span class="ml">Super simple</span><span class="md">Como si tuviera 8 a&ntilde;os</span></button>
+    <button class="mbtn" data-group="exp" data-val="vital" onclick="selModo(this,'exp')"><span class="me">&#x1F30D;</span><span class="ml">Para que sirve?</span><span class="md">Conecta con tu vida</span></button>
+  </div>
+  <div class="card">
+    <textarea id="exp-texto" class="ta" placeholder="Escribe el tema o la duda aqui..." rows="4"></textarea>
+    <div class="ia">
+      <button class="btn btn-ghost" onclick="document.getElementById('exp-file').click()">&#x1F4F8; Foto del libro</button>
+      <input id="exp-file" type="file" accept="image/*" class="hidden" onchange="loadImg(this,'exp-preview','exp')"/>
+      <img id="exp-preview" class="img-prev hidden" alt=""/>
+      <button id="exp-remove" class="img-rm hidden" onclick="removeImg('exp')">&#x2715;</button>
+      <button class="btn btn-river btn-ml" id="exp-btn" onclick="enviarExplicame()">&#x1F680; &iexcl;Explicame!</button>
+    </div>
+  </div>
+  <div id="exp-respuesta" class="rbox rbox-river hidden">
+    <div class="rhdr"><span class="rlbl" style="color:var(--river)">Tu explicaci&oacute;n:</span><button class="btn btn-audio" id="exp-aud" onclick="toggleAudio('exp-aud','exp-rbody')">&#x1F50A; Escuchar</button></div>
+    <div id="exp-rbody" class="rbody"></div>
+  </div>
+</div>
+
+<!-- EXAMEN -->
+<div id="mod-examen" class="mod hidden">
+  <div class="mhdr mhdr-bg-exa"><span class="mhdr-ic">&#x1F4DD;</span><div><div class="mhdr-title">PREPARO MI EXAMEN</div><div class="mhdr-sub">Dime el tema &mdash; genero lo que necesitas</div></div></div>
+  <div id="exa-inp">
+    <div class="g2" style="margin-bottom:8px">
+      <button class="mbtn active" data-group="exa" data-val="preguntas" onclick="selModo(this,'exa')"><span class="me">&#x2753;</span><span class="ml">Preguntas orales</span><span class="md">Te pregunto, t&uacute; respondes</span></button>
+      <button class="mbtn" data-group="exa" data-val="test" onclick="selModo(this,'exa')"><span class="me">&#x2705;</span><span class="ml">Mini test</span><span class="md">Correcci&oacute;n autom&aacute;tica</span></button>
+      <button class="mbtn" data-group="exa" data-val="flashcards" onclick="selModo(this,'exa')"><span class="me">&#x1F0CF;</span><span class="ml">Flashcards</span><span class="md">Concepto &rarr; explicaci&oacute;n</span></button>
+      <button class="mbtn" data-group="exa" data-val="simulacro" onclick="selModo(this,'exa')"><span class="me">&#x1F4CB;</span><span class="ml">Simulacro</span><span class="md">Como el examen real</span></button>
+      <button class="mbtn" data-group="exa" data-val="prediccion" onclick="selModo(this,'exa')"><span class="me">&#x1F52E;</span><span class="ml">Predicci&oacute;n</span><span class="md">Las 5 m&aacute;s probables</span></button>
+    </div>
+    <div class="card">
+      <textarea id="exa-tema" class="ta" placeholder="Tema del examen..." rows="3"></textarea>
+      <div class="ia"><button class="btn btn-sun btn-ml" id="exa-btn" onclick="enviarExamen()">&#x26A1; &iexcl;Generar!</button></div>
+    </div>
+  </div>
+  <div id="exa-res" class="rbox rbox-sun hidden">
+    <div class="rhdr"><span class="rlbl" style="color:var(--sun)" id="exa-rlbl">Resultado</span><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn btn-audio" id="exa-aud" onclick="toggleAudio('exa-aud','exa-rbody')">&#x1F50A; Escuchar</button><button class="btn btn-ghost" onclick="resetExamen()">&#x1F504; Nuevo</button></div></div>
+    <div id="exa-rbody" class="rbody"></div>
+  </div>
+  <div id="exa-test" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:var(--sun)" id="exa-test-titulo">Test</span>
+      <button class="btn btn-ghost" onclick="resetExamen()">&#x1F504; Nuevo</button>
+    </div>
+    <div id="exa-test-pqs"></div>
+    <div id="exa-score" class="score hidden"></div>
+  </div>
+</div>
+
+<!-- MATES -->
+<div id="mod-mates" class="mod hidden">
+  <div class="mhdr mhdr-bg-mate"><span class="mhdr-ic">&#x1F9EE;</span><div><div class="mhdr-title">MATES PASO A PASO</div><div class="mhdr-sub">Escribe o fotograf&iacute;a el ejercicio &mdash; te gu&iacute;o sin darte la respuesta</div></div></div>
+  <div><p class="stitle">Tarjetas gu&iacute;a r&aacute;pida</p><div class="chips" id="mate-chips"></div><div id="mate-chip-exp" class="chip-exp hidden"></div></div>
+  <div class="card">
+    <textarea id="mate-texto" class="ta" placeholder="Escribe el problema o la operaci&oacute;n..." rows="3"></textarea>
+    <div class="ia">
+      <button class="btn btn-ghost" onclick="document.getElementById('mate-file').click()">&#x1F4F8; Foto del ejercicio</button>
+      <input id="mate-file" type="file" accept="image/*" class="hidden" onchange="loadImg(this,'mate-preview','mate')"/>
+      <img id="mate-preview" class="img-prev hidden" alt=""/>
+      <button id="mate-remove" class="img-rm hidden" onclick="removeImg('mate')">&#x2715;</button>
+      <button class="btn btn-purple btn-ml" id="mate-btn" onclick="enviarMates()">&#x1F9EE; &iexcl;Ay&uacute;dame!</button>
+    </div>
+  </div>
+  <div id="mate-res" class="rbox rbox-purple hidden">
+    <div class="rhdr"><span class="rlbl" style="color:#a07aff">Tu tutor de mates:</span><button class="btn btn-audio" id="mate-aud" onclick="toggleAudio('mate-aud','mate-rbody')">&#x1F50A; Escuchar</button></div>
+    <div id="mate-rbody" class="rbody"></div>
+  </div>
+</div>
+
+<!-- AGENDA -->
+<div id="mod-agenda" class="mod hidden">
+  <div class="mhdr mhdr-bg-ag"><span class="mhdr-ic">&#x1F4C5;</span><div><div class="mhdr-title">RUTA DE HOY</div><div class="mhdr-sub">Foto de la agenda o escribe tus tareas &mdash; te organizo el d&iacute;a</div></div></div>
+  <div id="ag-inp" class="card">
+    <p class="stitle" style="margin-top:0">&iquest;Qu&eacute; tienes que hacer hoy?</p>
+    <textarea id="ag-texto" class="ta" placeholder="Ej: Mates ejercicios 3 y 4, estudiar tema 2 Sociales..." rows="4"></textarea>
+    <div class="ia">
+      <button class="btn btn-ghost" onclick="document.getElementById('ag-file').click()">&#x1F4F8; Foto de la agenda</button>
+      <input id="ag-file" type="file" accept="image/*" class="hidden" onchange="loadImg(this,'ag-preview','ag')"/>
+      <img id="ag-preview" class="img-prev hidden" alt=""/>
+      <button id="ag-remove" class="img-rm hidden" onclick="removeImg('ag')">&#x2715;</button>
+      <button class="btn btn-river btn-ml" id="ag-btn" onclick="enviarAgenda()">&#x1F5FA; &iexcl;Trazar ruta!</button>
+    </div>
+  </div>
+  <div id="ag-result" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:var(--river)">Tu ruta de hoy</span>
+      <div style="display:flex;gap:7px"><button class="btn btn-audio" id="ag-aud" onclick="toggleAudio('ag-aud','ag-audio-txt')">&#x1F50A; Escuchar</button><button class="btn btn-ghost" onclick="resetAgenda()">&#x1F504; Nueva</button></div>
+    </div>
+    <div id="ag-lista"></div>
+    <div id="ag-audio-txt" class="hidden"></div>
+  </div>
+</div>
+
+<!-- EMOCIONAL -->
+<div id="mod-emocional" class="mod hidden">
+  <div class="mhdr mhdr-bg-emo"><span class="mhdr-ic">&#x1F4AA;</span><div><div class="mhdr-title">&iquest;COMO ESTAS HOY?</div><div class="mhdr-sub">Tu entrenador mental &mdash; aqu&iacute; no hay notas ni juicios</div></div></div>
+  <div id="emo-sel">
+    <p class="stitle">&iquest;C&oacute;mo te sientes?</p>
+    <div class="g2" style="gap:10px">
+      <button class="emo-btn" onclick="emoElegir('bloqueado')"><span class="emo-ic">&#x1F624;</span><span class="emo-lb">Bloqueado o frustrado</span></button>
+      <button class="emo-btn" onclick="emoElegir('suspendido')"><span class="emo-ic">&#x1F61E;</span><span class="emo-lb">Me ha salido mal</span></button>
+      <button class="emo-btn" onclick="emoElegir('perdido')"><span class="emo-ic">&#x1F635;</span><span class="emo-lb">No entiendo nada</span></button>
+      <button class="emo-btn" onclick="emoElegir('nervioso')"><span class="emo-ic">&#x1F630;</span><span class="emo-lb">Nervioso por examen</span></button>
+      <button class="emo-btn" onclick="emoElegir('cansado')"><span class="emo-ic">&#x1F634;</span><span class="emo-lb">Cansado, sin ganas</span></button>
+      <button class="emo-btn" onclick="emoElegir('eso')"><span class="emo-ic">&#x1F393;</span><span class="emo-lb">La ESO me supera</span></button>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <p class="stitle" style="margin-top:0">O escr&iacute;beme directamente:</p>
+      <textarea id="emo-texto" class="ta" placeholder="Cu&eacute;ntame lo que sea. Aqu&iacute; todo vale..." rows="3"></textarea>
+      <div class="ia"><button class="btn btn-danger btn-ml" id="emo-btn" onclick="enviarEmocional()">&#x1F4AC; Hablar con mi entrenador</button></div>
+    </div>
+  </div>
+  <div id="emo-res" class="rbox rbox-danger hidden">
+    <div class="rhdr"><span class="rlbl" style="color:#ff6090">Tu entrenador:</span><button class="btn btn-audio" id="emo-aud" onclick="toggleAudio('emo-aud','emo-rbody')">&#x1F50A; Escuchar</button></div>
+    <div id="emo-rbody" class="rbody"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="resetEmocional()">&#x1F4AC; Seguir hablando</button>
+      <button class="btn btn-trail btn-ml" onclick="goExpress()">&#x1F3AF; &iexcl;A estudiar!</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOCHILA -->
+<div id="mod-mochila" class="mod hidden">
+  <div class="av-card">
+    <span class="av-big" id="av-em">&#x1F6B5;</span>
+    <div class="av-name">PABLO</div>
+    <span class="av-title" id="av-title">EXPLORADOR</span>
+    <div class="av-xp-track"><div class="av-xp-fill" id="av-xp-fill" style="width:0%"></div></div>
+    <div class="av-xp-lbl" id="av-xp-lbl">0 / 100 XP</div>
+    <div class="av-stats">
+      <div class="av-stat"><div class="av-stat-n" id="st-dias">7</div><div class="av-stat-l">dias racha</div></div>
+      <div class="av-stat"><div class="av-stat-n" id="st-ses">12</div><div class="av-stat-l">sesiones</div></div>
+      <div class="av-stat"><div class="av-stat-n" id="st-prob">24</div><div class="av-stat-l">problemas</div></div>
+      <div class="av-stat"><div class="av-stat-n" id="st-exp">18</div><div class="av-stat-l">explicaciones</div></div>
+    </div>
+  </div>
+  <div class="racha-card">
+    <div class="racha-left"><span class="racha-fire">&#x1F525;</span><div><div class="racha-n">7 d&iacute;as</div><div class="racha-lb">de racha activa</div></div></div>
+    <div class="racha-right"><div class="racha-msg">&iexcl;Sigue pedaleando, Pablo!</div><div class="racha-nx">Siguiente logro: 10 d&iacute;as</div><div class="ptrack"><div class="pfill" style="width:70%"></div></div></div>
+  </div>
+  <div><p class="stitle" style="color:var(--sun)">MISIONES DE HOY</p><div id="mis-lista"></div></div>
+  <div><p class="stitle" style="color:var(--trail)">COLECCION DE INSIGNIAS</p><div class="logros" id="logros-grid"></div></div>
+  <div><p class="stitle" style="color:var(--river)">MIS TARJETAS GUIA</p><div id="moch-tarjetas" style="display:flex;flex-direction:column;gap:7px"></div></div>
+</div>
+
+</main>
+</div>
+<script>
+var TARJETAS=[
+  {id:1,em:"\u2795",titulo:"SUMAR decimales",pasos:["Alinea las COMAS","Aniade CEROS si falta","Suma normal","BAJA la coma"]},
+  {id:2,em:"\u2796",titulo:"RESTAR decimales",pasos:["Numero GRANDE arriba","Alinea las COMAS","Aniade CEROS si falta","Resta normal","BAJA la coma"]},
+  {id:3,em:"\u00D7",titulo:"MULTIPLICAR decimales",pasos:["IGNORA las comas","Multiplica NORMAL","CUENTA decimales totales","Pon coma desde DERECHA"]},
+  {id:4,em:"\u00F7",titulo:"DIVIDIR decimales",pasos:["Divisor SIN decimales","Mueve comas IGUAL en ambos","Divide NORMAL","SUBE coma si sobra"]},
+  {id:5,em:"\u{1F9E9}",titulo:"RESOLVER problema",pasos:["LEO 2 veces","DIBUJO el problema","Que pregunta?","Elijo la operacion","OPERO y RESPONDO"]},
+  {id:6,em:"\u{1F4AA}",titulo:"SI ME EQUIVOCO",pasos:["RESPIRO 1-2-3","Todos nos equivocamos","Que hago diferente?","PIDO AYUDA","Lo INTENTO otra vez","Orgulloso de intentar!"]},
+];
+var NIVELES=[
+  {n:1,t:"EXPLORADOR",xp:100,em:"\u{1F6B5}"},
+  {n:2,t:"APRENDIZ",xp:250,em:"\u26F0"},
+  {n:3,t:"INVESTIGADOR",xp:500,em:"\u{1F3D4}"},
+  {n:4,t:"EXPERTO",xp:900,em:"\u{1F3C6}"},
+  {n:5,t:"MAESTRO TRAIL",xp:99999,em:"\u2B50"},
+];
+var LOGROS_DATA=[
+  {em:"\u{1F31F}",nm:"Primera sesion",ok:true},
+  {em:"\u{1F9E9}",nm:"Ninja decimales",ok:true},
+  {em:"\u{1F4DD}",nm:"Primer test",ok:true},
+  {em:"\u{1F525}",nm:"7 dias seguidos",ok:true},
+  {em:"\u{1F3C6}",nm:"10 sesiones",ok:false},
+  {em:"\u{1F680}",nm:"Semana completa",ok:false},
+  {em:"\u{1F3AF}",nm:"Express maestro",ok:false},
+  {em:"\u{1F41F}",nm:"Paciencia pescador",ok:false},
+  {em:"\u{1F48E}",nm:"Maestro TrailStudy",ok:false},
+];
+var MISIONES_DATA=[
+  {em:"\u{1F3AF}",tt:"Completa un Express",ds:"Sube una foto y haz las 4 etapas",xp:30,done:false},
+  {em:"\u{1F9E9}",tt:"Resuelve un problema",ds:"Con el tutor paso a paso",xp:20,done:false},
+  {em:"\u{1F4DD}",tt:"Mini test completado",ds:"Sobre cualquier tema",xp:25,done:true},
+  {em:"\u{1F525}",tt:"Mantén tu racha",ds:"Estudia aunque sea 5 minutos",xp:15,done:true},
+];
+var PABLO_SYS="Eres el asistente personal de Pablo, alumno de 1 ESO. Tiene TDAH, dislexia, disortografia y discalculia. Canal fuerte: auditivo-verbal. Canal debil: visuoespacial. Le encanta la bici de montana, la pesca y el deporte.\nREGLAS: habla a Pablo de tu, frases MUY cortas, emoji al inicio de cada punto, lenguaje simple, celebra logros con energia, usa analogias del deporte y la naturaleza, termina SIEMPRE con frase motivadora tipo ciclista. Texto apto para voz alta.";
+var MODO_PROMPTS={
+  clase:"Explica este contenido como una clase clara y ordenada. Usa pasos numerados y ejemplos concretos.",
+  cuento:"Convierte este contenido en una historia o analogia divertida y memorable.",
+  preguntas:"Haz 4 preguntas orales de menor a mayor dificultad. Tras cada una escribe RESPUESTA: y la respuesta corta.",
+  repaso:"Resume los 5 puntos MAS IMPORTANTES en frases muy cortas. Cada punto empieza con emoji diferente.",
+  simple:"Explica como si Pablo tuviera 8 anios. Palabras muy simples, ejemplos del recreo o del deporte.",
+  vital:"Explica conectandolo con la vida real de un chico de 12 anos al que le gusta el deporte y la naturaleza.",
+  preguntas_exa:"Genera 6 preguntas orales sobre el tema, progresivas. Formato: P: [pregunta]\nRESPUESTA: [respuesta corta]",
+  test:"Genera test de 5 preguntas. Responde SOLO con JSON array sin markdown ni texto adicional:\n[{\"pregunta\":\"...\",\"opciones\":[\"A) ...\",\"B) ...\",\"C) ...\",\"D) ...\"],\"correcta\":\"A\"}]",
+  flashcards:"Genera 6 flashcards. Formato:\nCONCEPTO: [concepto]\nEXPLICACION: [1-2 frases simples]\n---",
+  simulacro:"Crea simulacro de examen: 2 preguntas cortas, 1 desarrollo, 1 problema. Instrucciones claras antes de cada parte.",
+  prediccion:"Analiza el tema y genera las 5 preguntas MAS PROBABLES en el examen, ordenadas de mayor a menor probabilidad.",
+};
+var EMO_PROMPTS={
+  bloqueado:"Pablo se siente bloqueado y frustrado. Responde con empatia real, valida su emocion, y dale 1 estrategia concreta para salir del bloqueo ahora mismo. Usa una analogia de bicicleta o pesca.",
+  suspendido:"Pablo ha suspendido. Responde con calidez. Ayudale a separar el resultado de su valor como persona. Dale energia para el siguiente intento.",
+  perdido:"Pablo siente que no entiende nada. Responde con calma, normaliza no entender al principio, y propone un pequenio paso muy concreto.",
+  nervioso:"Pablo esta nervioso por un examen. Ayudale a canalizar esos nervios como energia, dale tecnica de respiracion simple.",
+  cansado:"Pablo esta cansado y sin ganas. Valida el cansancio y propone solo 10 minutos de estudio con recompensa al final.",
+  eso:"Pablo siente que no sabe sobrevivir a la ESO. Normaliza la situacion y dale 3 trucos concretos para organizarse.",
+};
+var S={expModo:"clase",exaModo:"preguntas",imgs:{exp:null,mate:null,ex:null,ag:null},mateChip:null,testPqs:[],testResps:{},exContent:null,exTestPqs:[],exTestResps:{},xp:220,agTareas:[]};
+function getLvl(xp){for(var i=NIVELES.length-1;i>=0;i--){if(i===0||xp>=NIVELES[i-1].xp)return NIVELES[i];}return NIVELES[0];}
+function getPrevXP(xp){var l=getLvl(xp);var i=NIVELES.indexOf(l);return i===0?0:NIVELES[i-1].xp;}
+function el(id){return document.getElementById(id);}
+function updateXP(){
+  var lvl=getLvl(S.xp),prev=getPrevXP(S.xp),next=lvl.xp===99999?S.xp+100:lvl.xp;
+  var pct=Math.min(100,((S.xp-prev)/(next-prev))*100);
+  try{el("xp-fill").style.width=pct+"%";}catch(e){}
+  try{el("av-xp-fill").style.width=pct+"%";}catch(e){}
+  try{el("xp-lvl-lbl").textContent="NIVEL "+lvl.n;}catch(e){}
+  try{el("xp-pts").textContent=S.xp+"/"+next+" XP";}catch(e){}
+  try{el("hdr-lvl").textContent=lvl.n;}catch(e){}
+  try{el("hdr-av").textContent=lvl.em;}catch(e){}
+  try{el("av-em").textContent=lvl.em;}catch(e){}
+  try{el("av-title").textContent=lvl.t;}catch(e){}
+  try{el("av-xp-lbl").textContent=S.xp+" / "+next+" XP";}catch(e){}
+}
+function addXP(n){var old=getLvl(S.xp).n;S.xp+=n;var nw=getLvl(S.xp).n;updateXP();toast("+"+n+" XP");if(nw>old)setTimeout(function(){toast("NIVEL "+nw+" desbloqueado! "+getLvl(S.xp).t);},1300);}
+function toast(msg){var t=el("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show");},2300);}
+function switchMod(btn,color){document.querySelectorAll(".nb").forEach(function(b){b.classList.remove("active");b.style.borderBottomColor="transparent";});btn.classList.add("active");btn.style.borderBottomColor=color;document.querySelectorAll("[id^='mod-']").forEach(function(m){m.classList.add("hidden");});el("mod-"+btn.dataset.mod).classList.remove("hidden");stopSpeech();}
+function goExpress(){switchMod(document.querySelector("[data-mod='express']"),"var(--trail)");}
+function goMochila(){switchMod(document.querySelector("[data-mod='mochila']"),"var(--success)");}
+function selModo(btn,group){document.querySelectorAll("[data-group='"+group+"']").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");if(group==="exp")S.expModo=btn.dataset.val;if(group==="exa")S.exaModo=btn.dataset.val;}
+function loadImg(input,prevId,key){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){S.imgs[key]=ev.target.result;el(prevId).src=ev.target.result;el(prevId).classList.remove("hidden");el(key+"-remove").classList.remove("hidden");};r.readAsDataURL(f);}
+function removeImg(key){S.imgs[key]=null;el(key+"-preview").classList.add("hidden");el(key+"-remove").classList.add("hidden");el(key+"-file").value="";}
+var curUtt=null;
+function stopSpeech(){if(window.speechSynthesis)window.speechSynthesis.cancel();curUtt=null;}
+function speak(text,onEnd){stopSpeech();if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(text.replace(/[*#_]/g,""));u.lang="es-ES";u.rate=0.88;u.pitch=1.05;var vs=window.speechSynthesis.getVoices();var es=vs.find(function(v){return v.lang.indexOf("es")===0;});if(es)u.voice=es;u.onend=function(){curUtt=null;if(onEnd)onEnd();};curUtt=u;window.speechSynthesis.speak(u);}
+function toggleAudio(btnId,divId){var btn=el(btnId);if(curUtt){stopSpeech();document.querySelectorAll(".btn-audio").forEach(function(b){b.classList.remove("playing");b.innerHTML="&#x1F50A; Escuchar";});return;}var txt=el(divId).innerText;btn.classList.add("playing");btn.innerHTML="&#x23F9; Parar";speak(txt,function(){btn.classList.remove("playing");btn.innerHTML="&#x1F50A; Escuchar";});}
+// API - includes required browser header
+function getAPIKey(){return localStorage.getItem("trailstudy_api_key")||"";}
+function mostrarSetup(){var s=document.getElementById("setup-screen");s.style.display="flex";}
+function ocultarSetup(){var s=document.getElementById("setup-screen");s.style.display="none";}
+async function callClaude(messages,system){
+  var key=getAPIKey();
+  if(!key){mostrarSetup();return "Introduce tu clave API para continuar.";}
+  var res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":key,"anthropic-version":"2023-06-01"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:system,messages:messages})
+  });
+  var data=await res.json();
+  if(data.error){
+    if(data.error.type==="authentication_error")return "Error: clave API no configurada. Habla con tu orientadora.";
+    return "Error: "+data.error.message;
+  }
+  return data.content&&data.content[0]?data.content[0].text:"No pude generar respuesta.";
+}
+function buildContent(txt,imgKey){var c=[];var img=S.imgs[imgKey];if(img)c.push({type:"image",source:{type:"base64",media_type:img.split(";")[0].split(":")[1],data:img.split(",")[1]}});if(txt)c.push({type:"text",text:txt});return c.length?c:[{type:"text",text:"Hola"}];}
+function setBtn(id,loading,lbl){var b=el(id);b.disabled=loading;b.innerHTML=loading?"<span class='spin'></span>":lbl;}
+function renderBody(divId,text){el(divId).innerHTML=text.split("\n").map(function(l){return l.trim()?"<p>"+l+"</p>":"<br>";}).join("");el(divId).classList.add("slideup");}
+function exDots(step){for(var i=0;i<4;i++){var d=el("exd"+i);d.className="ex-dot"+(i<step?" done-d":i===step?" cur":"");}}
+function exShow(n){for(var i=0;i<=4;i++){var s=el("ex-s"+i);if(s)s.classList.add("hidden");}var s=el("ex-s"+n);if(s){s.classList.remove("hidden");s.classList.add("pop");}exDots(n>0?n-1:0);}
+async function expressStart(){var txt=el("ex-texto").value.trim();if(!txt&&!S.imgs.ex)return;S.exContent=txt||"(imagen)";setBtn("ex-start-btn",true,"");exShow(1);var c=buildContent(txt?"Contenido:\n"+txt+"\n\n"+MODO_PROMPTS.clase:MODO_PROMPTS.clase,"ex");try{var r=await callClaude([{role:"user",content:c}],PABLO_SYS);renderBody("ex-exp-body",r);}catch(e){renderBody("ex-exp-body","Error de conexion. Usa la URL de GitHub Pages.");}setBtn("ex-start-btn",false,"Arrancar!");}
+async function expressStep(n){exShow(n);if(n===2){el("ex-q-body").innerHTML="<span class='spin'></span>";var p="Sobre este contenido:\n"+S.exContent+"\n\nHaz 4 preguntas orales. Despues de cada pregunta escribe RESPUESTA: y la respuesta corta.";try{var r=await callClaude([{role:"user",content:p}],PABLO_SYS);renderBody("ex-q-body",r);}catch(e){renderBody("ex-q-body","Error.");}}if(n===3){var div=el("ex-test-body");div.innerHTML="<span class='spin'></span>";try{var r=await callClaude([{role:"user",content:"Sobre:\n"+S.exContent+"\n\n"+MODO_PROMPTS.test}],PABLO_SYS);var pqs=JSON.parse(r.replace(/```json|```/g,"").trim());S.exTestPqs=pqs;S.exTestResps={};div.innerHTML="";pqs.forEach(function(p,i){var d=document.createElement("div");d.className="tpq";d.id="extpq-"+i;d.innerHTML="<p class='tq'>"+(i+1)+". "+p.pregunta+"</p>"+p.opciones.map(function(op){return "<button class='top' onclick=\"exRT("+i+",'"+op.replace(/'/g,"\\'")+"',this)\">"+op+"</button>";}).join("")+"<p class='tfb hidden' id='extfb-"+i+"'></p>";div.appendChild(d);});}catch(e){el("ex-test-body").innerHTML="<p style='color:var(--danger)'>Error generando test.</p>";}}}
+function exRT(idx,op,btn){if(S.exTestResps[idx]!==undefined)return;S.exTestResps[idx]=op;var p=S.exTestPqs[idx];var ok=op[0]===p.correcta[0];el("extpq-"+idx).classList.add(ok?"ok":"mal");el("extpq-"+idx).querySelectorAll(".top").forEach(function(b){if(b.textContent[0]===p.correcta[0])b.classList.add("cor");else if(b===btn&&!ok)b.classList.add("mal");});var fb=el("extfb-"+idx);fb.textContent=ok?"Correcto!":"Era: "+p.correcta;fb.className="tfb "+(ok?"ok":"mal");fb.classList.remove("hidden");if(Object.keys(S.exTestResps).length===S.exTestPqs.length){var cor=S.exTestPqs.filter(function(p2,i){return S.exTestResps[i]&&S.exTestResps[i][0]===p2.correcta[0];}).length;var sc=el("ex-test-score");var em=cor>=4?"\u{1F3C6}":cor>=2?"\u{1F4AA}":"\u{1F4DA}";sc.innerHTML="<div style='text-align:center;padding:14px;background:var(--pine);border-radius:12px;border:1px solid var(--leaf);margin-top:10px'><div style='font-size:36px'>"+em+"</div><div class='score-n'>"+cor+"/"+S.exTestPqs.length+"</div><button class='btn btn-trail' style='margin-top:8px' onclick='expressFinish("+cor+")'>A la cima!</button></div>";sc.classList.remove("hidden");}}
+async function expressFinish(cor){exShow(4);exDots(3);document.querySelectorAll(".ex-dot").forEach(function(d){d.className="ex-dot done-d";});el("ex-resumen-body").innerHTML="<span class='spin'></span>";var p="Pablo acabo una sesion Express. Tema: "+S.exContent+". Resultado: "+cor+"/"+(S.exTestPqs.length||5)+". Genera resumen final muy motivador con analogias de ciclismo de montana.";try{var r=await callClaude([{role:"user",content:p}],PABLO_SYS);renderBody("ex-resumen-body",r);}catch(e){renderBody("ex-resumen-body","Sesion completada! Eso es lo que importa!");}addXP(50);}
+function expressReset(){exShow(0);el("ex-texto").value="";S.imgs.ex=null;el("ex-preview").classList.add("hidden");el("ex-remove").classList.add("hidden");S.exTestPqs=[];S.exTestResps={};for(var i=0;i<4;i++){var d=el("exd"+i);if(d)d.className="ex-dot"+(i===0?" cur":"");}}
+async function enviarExplicame(){var txt=el("exp-texto").value.trim();if(!txt&&!S.imgs.exp)return;setBtn("exp-btn",true,"");el("exp-respuesta").classList.add("hidden");stopSpeech();var c=buildContent(txt?"Contenido:\n"+txt+"\n\nModo: "+MODO_PROMPTS[S.expModo]:"Modo: "+MODO_PROMPTS[S.expModo],"exp");try{var r=await callClaude([{role:"user",content:c}],PABLO_SYS);renderBody("exp-rbody",r);el("exp-respuesta").classList.remove("hidden");addXP(10);}catch(e){renderBody("exp-rbody","Error de conexion.");el("exp-respuesta").classList.remove("hidden");}setBtn("exp-btn",false,"Explicame!");}
+async function enviarExamen(){var tema=el("exa-tema").value.trim();if(!tema)return;setBtn("exa-btn",true,"");stopSpeech();S.testPqs=[];S.testResps={};var pk=S.exaModo==="preguntas"?"preguntas_exa":S.exaModo;try{var r=await callClaude([{role:"user",content:"Tema: "+tema+"\n\n"+MODO_PROMPTS[pk]}],PABLO_SYS);if(S.exaModo==="test"){try{var pqs=JSON.parse(r.replace(/```json|```/g,"").trim());S.testPqs=pqs;el("exa-test-titulo").textContent="Test: "+tema;var cont=el("exa-test-pqs");cont.innerHTML="";pqs.forEach(function(p,i){var d=document.createElement("div");d.className="tpq";d.id="tpq-"+i;d.innerHTML="<p class='tq'>"+(i+1)+". "+p.pregunta+"</p>"+p.opciones.map(function(op){return "<button class='top' onclick=\"respTest("+i+",'"+op.replace(/'/g,"\\'")+"',this)\">"+op+"</button>";}).join("")+"<p class='tfb hidden' id='tfb-"+i+"'></p>";cont.appendChild(d);});el("exa-inp").classList.add("hidden");el("exa-test").classList.remove("hidden");}catch(e){showExaRes(r);}}else{showExaRes(r);}}catch(e){showExaRes("Error de conexion.");}setBtn("exa-btn",false,"Generar!");}
+function showExaRes(text){var lbs={preguntas:"Preguntas orales",flashcards:"Flashcards",simulacro:"Simulacro",prediccion:"Prediccion"};el("exa-rlbl").textContent=lbs[S.exaModo]||"Resultado";renderBody("exa-rbody",text);el("exa-inp").classList.add("hidden");el("exa-res").classList.remove("hidden");addXP(15);}
+function respTest(idx,op,btn){if(S.testResps[idx]!==undefined)return;S.testResps[idx]=op;var p=S.testPqs[idx];var ok=op[0]===p.correcta[0];el("tpq-"+idx).classList.add(ok?"ok":"mal");el("tpq-"+idx).querySelectorAll(".top").forEach(function(b){if(b.textContent[0]===p.correcta[0])b.classList.add("cor");else if(b===btn&&!ok)b.classList.add("mal");});var fb=el("tfb-"+idx);fb.textContent=ok?"Correcto! Genial!":"Era: "+p.correcta;fb.className="tfb "+(ok?"ok":"mal");fb.classList.remove("hidden");if(Object.keys(S.testResps).length===S.testPqs.length){var cor=S.testPqs.filter(function(p2,i){return S.testResps[i]&&S.testResps[i][0]===p2.correcta[0];}).length;var s=el("exa-score");var em=cor>=4?"\u{1F3C6}":cor>=2?"\u{1F4AA}":"\u{1F4DA}";var msg=cor>=4?"Estas en la cima!":cor>=2?"Buen ritmo! Repasa un poco.":"El camino se hace pedaleando.";s.innerHTML="<div class='score-em'>"+em+"</div><div class='score-n'>"+cor+"/"+S.testPqs.length+"</div><p class='score-m'>"+msg+"</p>";s.classList.remove("hidden");addXP(25);}}
+function resetExamen(){stopSpeech();el("exa-inp").classList.remove("hidden");el("exa-res").classList.add("hidden");el("exa-test").classList.add("hidden");el("exa-test-pqs").innerHTML="";el("exa-score").classList.add("hidden");S.testPqs=[];S.testResps={};}
+var MATE_SYS=PABLO_SYS+"\n\nEres el tutor de matematicas. NUNCA des la respuesta directa. Guia paso a paso. Termina cada paso con: Lo ves? Seguimos pedaleando?";
+async function enviarMates(){var txt=el("mate-texto").value.trim();if(!txt&&!S.imgs.mate)return;setBtn("mate-btn",true,"");el("mate-res").classList.add("hidden");stopSpeech();var c=buildContent(txt?"Problema:\n"+txt+"\n\nGuiame paso a paso sin darme la respuesta.":"Mira esta imagen. Guiame sin darme la respuesta.","mate");try{var r=await callClaude([{role:"user",content:c}],MATE_SYS);renderBody("mate-rbody",r);el("mate-res").classList.remove("hidden");addXP(20);}catch(e){renderBody("mate-rbody","Error de conexion.");el("mate-res").classList.remove("hidden");}setBtn("mate-btn",false,"Ayudame!");}
+var AG_SYS=PABLO_SYS+"\n\nEres el organizador de Pablo. Analiza sus tareas y devuelve SOLO un JSON array sin markdown:\n[{\"asig\":\"Mates\",\"desc\":\"Ejercicios 3 y 4\",\"tiempo\":20,\"ic\":\"emoji\"},...]\nOrdena de mas urgente a menos.";
+async function enviarAgenda(){var txt=el("ag-texto").value.trim();if(!txt&&!S.imgs.ag)return;setBtn("ag-btn",true,"");var c=buildContent(txt?"Tareas de Pablo:\n"+txt:"Analiza la agenda de la foto.","ag");try{var r=await callClaude([{role:"user",content:c}],AG_SYS);var clean=r.replace(/```json|```/g,"").trim();var tareas;try{tareas=JSON.parse(clean);}catch(e){tareas=[{asig:"Tareas del dia",desc:r.substring(0,150),tiempo:30,ic:"\u{1F4DA}"}];}S.agTareas=tareas.map(function(t){return Object.assign({},t,{done:false});});renderTareas();el("ag-audio-txt").textContent="Tu ruta de hoy, Pablo. "+tareas.map(function(t,i){return (i+1)+": "+t.asig+", "+t.desc+", "+t.tiempo+" minutos.";}).join(" ");addXP(10);}catch(e){alert("Error. Escribe las tareas en texto.");}setBtn("ag-btn",false,"Trazar ruta!");}
+function renderTareas(){var lista=el("ag-lista");lista.innerHTML="";S.agTareas.forEach(function(t,i){var d=document.createElement("div");d.className="tarea";d.id="tarea-"+i;d.innerHTML="<span class='tarea-ic'>"+t.ic+"</span><div class='tarea-body'><div class='tarea-asig'>"+t.asig+"</div><div class='tarea-desc'>"+t.desc+"</div><div class='tarea-time'>Tiempo aprox: "+t.tiempo+" min</div></div><span class='tarea-chk' onclick='tareaHecha("+i+")'>&#x2B1C;</span>";lista.appendChild(d);});el("ag-inp").classList.add("hidden");el("ag-result").classList.remove("hidden");el("ag-result").classList.add("slideup");}
+function tareaHecha(i){S.agTareas[i].done=true;var d=el("tarea-"+i);d.querySelector(".tarea-chk").innerHTML="&#x2705;";d.classList.add("done");var rest=S.agTareas.filter(function(t){return !t.done;}).length;if(rest===0)toast("Todas las etapas completadas!");else toast("Etapa superada! Quedan "+rest);addXP(8);}
+function resetAgenda(){el("ag-inp").classList.remove("hidden");el("ag-result").classList.add("hidden");el("ag-texto").value="";S.imgs.ag=null;el("ag-preview").classList.add("hidden");el("ag-remove").classList.add("hidden");}
+var EMO_SYS=PABLO_SYS+"\n\nEres el entrenador mental de Pablo. Primero SIEMPRE valida su emocion. Luego ofrece perspectiva. Usa analogias de ciclismo o pesca. Se su companiero de ruta.";
+function emoElegir(tipo){el("emo-texto").value="";enviarEmoDirecto(EMO_PROMPTS[tipo]);}
+async function enviarEmocional(){var txt=el("emo-texto").value.trim();if(!txt)return;enviarEmoDirecto("Pablo dice: \""+txt+"\"\n\nResponde con empatia real. Primero valida su emocion.");}
+async function enviarEmoDirecto(prompt){setBtn("emo-btn",true,"");el("emo-res").classList.add("hidden");stopSpeech();try{var r=await callClaude([{role:"user",content:prompt}],EMO_SYS);renderBody("emo-rbody",r);el("emo-res").classList.remove("hidden");}catch(e){renderBody("emo-rbody","Estoy aqui, Pablo.");el("emo-res").classList.remove("hidden");}setBtn("emo-btn",false,"Hablar con mi entrenador");}
+function resetEmocional(){el("emo-res").classList.add("hidden");el("emo-texto").value="";stopSpeech();}
+function initMochila(){
+  var ml=el("mis-lista");ml.innerHTML="";
+  MISIONES_DATA.forEach(function(m){var d=document.createElement("div");d.className="mision"+(m.done?" done":"");d.innerHTML="<span class='mision-ic'>"+m.em+"</span><div class='mision-body'><div class='mision-tt'>"+m.tt+"</div><div class='mision-ds'>"+m.ds+"</div></div><span class='mision-xp'>+"+m.xp+" XP</span><span class='mision-chk'>"+(m.done?"&#x2705;":"&#x2B1C;")+"</span>";ml.appendChild(d);});
+  var lg=el("logros-grid");lg.innerHTML="";
+  LOGROS_DATA.forEach(function(l){var d=document.createElement("div");d.className="logro"+(l.ok?" unlock":"");d.style.opacity=l.ok?"1":"0.3";d.innerHTML="<span class='le'>"+l.em+"</span><span class='ln'>"+l.nm+"</span>"+(l.ok?"":"<span class='lk'>&#x1F512;</span>");lg.appendChild(d);});
+  var tc=el("moch-tarjetas");tc.innerHTML="";
+  TARJETAS.forEach(function(t){var d=document.createElement("div");d.className="tcard";d.innerHTML="<div class='trow'><button class='ttog' onclick='togTarj("+t.id+")'><span class='te'>"+t.em+"</span><span class='tt'>"+t.titulo+"</span><span class='ta2' id='tarr-"+t.id+"'>&#x25BC;</span></button><button class='btn btn-audio' style='padding:7px 11px;font-size:12px' onclick='leerTarj("+t.id+")'>&#x1F50A;</button></div><ol class='tsteps hidden' id='tsteps-"+t.id+"'>"+t.pasos.map(function(p){return "<li>"+p+"</li>";}).join("")+"</ol>";tc.appendChild(d);});
+}
+function togTarj(id){var s=el("tsteps-"+id);var a=el("tarr-"+id);var open=!s.classList.contains("hidden");s.classList.toggle("hidden",open);a.innerHTML=open?"&#x25BC;":"&#x25B2;";}
+function leerTarj(id){var t=TARJETAS.find(function(x){return x.id===id;});speak(t.titulo+". "+t.pasos.join(". "));}
+function initMateChips(){var c=el("mate-chips");TARJETAS.slice(0,5).forEach(function(t){var b=document.createElement("button");b.className="chip";b.textContent=t.em+" "+t.titulo;b.onclick=function(){if(S.mateChip===t.id){S.mateChip=null;el("mate-chip-exp").classList.add("hidden");b.classList.remove("active");}else{document.querySelectorAll("#mate-chips .chip").forEach(function(x){x.classList.remove("active");});S.mateChip=t.id;b.classList.add("active");el("mate-chip-exp").innerHTML="<strong>"+t.em+" "+t.titulo+"</strong><ol>"+t.pasos.map(function(p){return "<li>"+p+"</li>";}).join("")+"</ol>";el("mate-chip-exp").classList.remove("hidden");}};c.appendChild(b);});}
+function showBanner(msg){var b=document.createElement("div");b.className="api-banner";var sp=document.createElement("span");sp.textContent=msg;var x=document.createElement("button");x.className="api-banner-x";x.textContent="X";x.onclick=function(){b.remove();};b.appendChild(sp);b.appendChild(x);document.body.prepend(b);}
+async function guardarClave(){
+  var key=document.getElementById("api-key-input").value.trim();
+  var btn=document.getElementById("setup-btn");
+  var err=document.getElementById("setup-error");
+  err.style.display="none";
+  if(!key){err.textContent="Pega tu clave antes de continuar.";err.style.display="block";return;}
+  if(!key.startsWith("sk-ant-")){err.textContent="La clave debe empezar por sk-ant- Comprueba que la has copiado completa.";err.style.display="block";return;}
+  btn.disabled=true;btn.innerHTML="<span class=\'spin\'></span> Verificando...";
+  try{
+    var res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":key,"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:10,messages:[{role:"user",content:"Hola"}]})
+    });
+    var data=await res.json();
+    if(data.error&&data.error.type==="authentication_error"){
+      err.innerHTML="Clave incorrecta. Comprueba que la has copiado bien desde <strong>console.anthropic.com</strong>";
+      err.style.display="block";btn.disabled=false;btn.innerHTML="Activar TrailStudy";return;
+    }
+    localStorage.setItem("trailstudy_api_key",key);
+    btn.innerHTML="Clave guardada!";
+    setTimeout(function(){ocultarSetup();toast("TrailStudy activado! Bienvenido, Pablo!");},800);
+  }catch(e){
+    err.textContent="Error de conexion. Comprueba que tienes internet.";
+    err.style.display="block";btn.disabled=false;btn.innerHTML="Activar TrailStudy";
+  }
+}
+window.addEventListener("DOMContentLoaded",function(){
+  initMateChips();initMochila();updateXP();
+  if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.addEventListener("voiceschanged",function(){});}
+  var h=new Date().getHours();
+  try{el("hdr-sub").textContent=h<14?"Buenos dias, Pablo!":h<20?"Buenas tardes!":"Buenas noches!";}catch(e){}
+  // Check for API key on startup
+  if(!getAPIKey()){
+    mostrarSetup();
+  }
+  // Add settings button to mochila
+  var moch=el("mod-mochila");
+  if(moch){
+    var settingsBtn=document.createElement("button");
+    settingsBtn.className="btn btn-ghost";
+    settingsBtn.style="width:100%;margin-top:8px;justify-content:center";
+    settingsBtn.innerHTML="&#x2699;&#xFE0F; Cambiar clave API";
+    settingsBtn.onclick=function(){
+      document.getElementById("api-key-input").value="";
+      mostrarSetup();
+    };
+    moch.appendChild(settingsBtn);
+  }
+});
+// Service worker ONLY on https - NOT on file://
+if("serviceWorker" in navigator && location.protocol==="https:"){
+  window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});
+}
+</script>
+</body>
+</html>
